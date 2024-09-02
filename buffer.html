@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Acquisition Phases and Surface Contents</title>
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.phase {
+    padding: 10px;
+    color: white;
+    display: inline-block;
+    width: 160px;
+    margin-right: -5px;
+    margin-left: 0px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.acquisition-phase-1 { background-color: #ff6347; }
+.acquisition-phase-2 { background-color: #3cb371; }
+.acquisition-phase-3 { background-color: #1e90ff; }
+
+.return-phase-1 { background-color: #ff6347;
+    width: 60px;
+    margin-top: 5px;
+    margin-left: 200px; }
+.return-phase-2 { background-color: #3cb371;     width: 60px;
+    margin-top: 5px;
+    margin-left: 110px; }
+.return-phase-3 { background-color: #1e90ff;     width: 60px;
+    margin-top: 5px;
+    margin-left: 110px; }
+
+.surface-contents {
+    display: flex;
+    margin-top: 10px;
+    margin-left: 45px;
+}
+
+.surface-contents {
+    position: relative; /* To position rectangles relative to the container */
+    display: flex; /* To keep parallelograms and rectangles aligned */
+    flex-wrap: wrap; /* Allows elements to wrap if necessary */
+}
+
+.parallelogram {
+    width: 180px;
+    height: 50px;
+    margin-right: 0px; /* Spacing between parallelogram and rectangle */
+    transform: skew(60deg);
+    position: relative; /* To position the arrow inside each parallelogram */
+}
+
+.parallelogram::before {
+    content: "";
+    position: absolute;
+    width: 10px; /* Adjust thickness as needed */
+    height: 100%;
+    background-color: brown; /* Adjust color as needed */
+    left: 50%; /* Center the line */
+    top: 0;
+}
+
+.parallelogram::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-bottom: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid black; /* Adjust color as needed */
+    border-left: 8px solid black; /* Adjust color as needed */
+    transform: translate(50%,100%);
+}
+
+.surface-1 { background-color: #ff6347; }
+.surface-2 { background-color: #3cb371; }
+.surface-3 { background-color: #1e90ff; }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Acquisition Phases -->
+        <div class="phase acquisition-phase-1">Acquisition Buffer 1</div>
+        <div class="phase acquisition-phase-2">Acquisition Buffer 2</div>
+        <div class="phase acquisition-phase-3">Acquisition Buffer 3</div>
+        <div class="phase acquisition-phase-1">Acquisition Buffer 1</div>
+
+        <div class="surface-contents">
+            <div class="parallelogram surface-1"></div>
+        
+            <div class="parallelogram surface-2"></div>
+        
+            <div class="parallelogram surface-3"></div>
+        
+            <div class="parallelogram surface-1"></div>
+        </div>
+        <div class="surface-contents">
+            <div class="phase return-phase-1">Pop</div>
+            <div class="phase return-phase-2">Pop</div>
+            <div class="phase return-phase-3">Pop</div>
+        </div>
+    </div>
+</body>
+</html>

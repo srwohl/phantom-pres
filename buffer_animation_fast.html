@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Circular Buffer Animation</title>
+        <style>
+            /* General styles */
+            body {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+                background-color: #f0f0f0;
+                position: relative;
+            }
+
+            /* Ring container */
+            .ring {
+                position: relative;
+                width: 600px; /* Outer diameter of the ring */
+                height: 600px; /* Outer diameter of the ring */
+                border-radius: 50%;
+                background: conic-gradient(
+                    #ff6347 0deg 120deg,
+                    #3cb371 120deg 240deg,
+                    #1e90ff 240deg 360deg
+                );
+                overflow: hidden; /* Ensure ticks do not overflow */
+            }
+
+            /* Hollow center to create ring effect */
+            .ring::before {
+                content: "";
+                position: absolute;
+                top: 25%; /* This creates the thickness of the ring */
+                left: 25%; /* This creates the thickness of the ring */
+                width: 50%; /* Inner diameter of the hollow center */
+                height: 50%; /* Inner diameter of the hollow center */
+                border-radius: 50%;
+                background-color: #f0f0f0; /* Match the background color */
+            }
+
+            /* Tick styling */
+            .tick {
+                position: absolute;
+                width: 4px;
+                height: 90px;
+                background-color: black;
+                transform-origin: 50% 100%; /* Rotate around the top center */
+                transition: background-color 0.5s; /* Animation duration for color change */
+                border: 0px solid black;
+            }
+
+            /* Input container styling */
+            .input-container {
+                display: flex;
+                align-items: center;
+                margin-top: 20px;
+            }
+
+            /* Input box styling */
+            #tickInput {
+                width: 80px;
+                text-align: center;
+                font-size: 16px;
+            }
+
+            /* Button styling */
+            .button {
+                width: 30px;
+                height: 30px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 18px;
+                cursor: pointer;
+                border: 1px solid #ccc;
+                background-color: #fff;
+                margin: 0 5px;
+                border-radius: 3px;
+            }
+
+            /* Start and Reset button styling */
+            .animation-buttons {
+                display: flex;
+                gap: 10px;
+                margin-top: 20px;
+            }
+
+            .animation-button {
+                padding: 10px 20px;
+                font-size: 16px;
+                cursor: pointer;
+                border: 1px solid #ccc;
+                background-color: #fff;
+                border-radius: 5px;
+            }
+            .legend {
+                margin-top: 20px;
+                padding: 10px;
+                border: 1px solid #ccc;
+                background-color: #fff;
+                border-radius: 5px;
+                width: 350px; /* Increase width to accommodate two columns */
+            }
+
+            /* Title styling for the legend */
+            .legend h3 {
+                margin: 10px 0;
+                font-size: 18px;
+                text-align: center;
+            }
+
+            /* Row styling to handle flex and spacing */
+            .legend-row {
+                display: flex;
+                justify-content: space-around; /* Spreads items across the row */
+                flex-wrap: wrap; /* Allows items to wrap onto the next line */
+                gap: 10px; /* Space between items */
+                margin-bottom: 10px;
+            }
+
+            /* Individual legend item styling */
+            .legend-item {
+                display: flex;
+                align-items: center;
+                margin-bottom: 5px;
+            }
+
+            /* Color box styling */
+            .color-box {
+                width: 20px;
+                height: 20px;
+                margin-right: 10px;
+                border: 1px solid #000;
+            }
+
+            /* Specific colors for each item */
+            .color-box.buffer1 {
+                background-color: #ff6347; /* Tomato */
+            }
+
+            .color-box.buffer2 {
+                background-color: #3cb371; /* Medium Sea Green */
+            }
+
+            .color-box.buffer3 {
+                background-color: #1e90ff; /* Dodger Blue */
+            }
+
+            .color-box.aliceblue {
+                background-color: aliceblue;
+            }
+
+            .color-box.orange {
+                background-color: rgb(249, 165, 44);
+            }
+
+            .color-box.brown {
+                background-color: brown;
+            }
+
+            .color-box.black {
+                background-color: black;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- <div class="legend">
+            <h3>Buffers</h3>
+            <div class="legend-row">
+                <div class="legend-item">
+                    <div class="color-box buffer1"></div>
+                    <span>Buffer 0</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box buffer2"></div>
+                    <span>Buffer 1</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box buffer3"></div>
+                    <span>Buffer 2</span>
+                </div>
+            </div> -->
+            <!-- <h3>Buffer Parts</h3>
+            <div class="legend-row">
+                <div class="legend-item">
+                    <div class="color-box aliceblue"></div>
+                    <span>Active tick</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box orange"></div>
+                    <span>Saving</span>
+                </div>
+            </div>
+            <div class="legend-row">
+                <div class="legend-item">
+                    <div class="color-box brown"></div>
+                    <span>Ready to return</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box black"></div>
+                    <span>Ready</span>
+                </div>
+            </div> -->
+
+        <div class="ring" id="ring">
+            <!-- Ticks will be inserted here -->
+        <div class="tick" style="transform: rotate(1.05263deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(3.05263deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(5.05263deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(7.05263deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(9.05263deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(11.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(13.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(15.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(17.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(19.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(21.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(23.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(25.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(27.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(29.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(31.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(33.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(35.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(37.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(39.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(41.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(43.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(45.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(47.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(49.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(51.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(53.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(55.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(57.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(59.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(61.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(63.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(65.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(67.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(69.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(71.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(73.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(75.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(77.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(79.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(81.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(83.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(85.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(87.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(89.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(91.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(93.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(95.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(97.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(99.0526deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(101.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(103.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(105.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(107.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(109.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(111.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(113.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(115.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(117.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(119.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(121.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(123.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(125.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(127.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(129.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(131.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(133.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(135.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(137.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(139.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(141.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(143.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(145.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(147.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(149.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(151.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(153.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(155.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(157.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(159.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(161.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(163.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(165.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(167.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(169.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(171.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(173.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(175.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(177.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(179.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(181.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(183.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(185.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(187.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(189.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(191.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(193.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(195.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(197.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(199.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(201.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(203.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(205.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(207.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(209.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(211.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(213.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(215.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(217.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(219.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(221.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(223.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(225.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(227.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(229.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(231.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(233.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(235.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(237.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(239.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(241.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(243.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(245.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(247.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(249.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(251.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(253.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(255.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(257.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(259.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(261.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(263.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(265.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(267.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(269.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(271.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(273.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(275.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(277.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(279.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(281.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(283.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(285.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(287.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(289.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(291.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(293.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(295.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(297.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(299.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(301.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(303.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(305.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(307.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(309.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(311.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(313.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(315.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(317.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(319.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(321.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(323.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(325.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(327.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(329.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(331.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(333.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(335.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(337.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(339.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(341.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(343.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(345.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(347.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(349.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(351.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(353.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(355.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(357.053deg) translateY(-210px); top: 210px; left: 296px;"></div><div class="tick" style="transform: rotate(359.053deg) translateY(-210px); top: 210px; left: 296px;"></div></div>
+
+        <!-- Input box container with increment and decrement buttons -->
+        <div class="input-container" style="display: none;">
+            <label for="button"> BufferPartCount </label>
+            <div class="button" id="decrement">-</div>
+            <input type="number" id="tickInput" min="3" max="256" step="3" value="60">
+            <div class="button" id="increment">+</div>
+        </div>
+
+        <!-- Animation control buttons -->
+        <div class="animation-buttons" style="display: none;">
+            <button class="animation-button" id="startAnimation">
+                Start Animation
+            </button>
+            <button class="animation-button" id="resetAnimation">
+                Reset Animation
+            </button>
+        </div>
+
+        <script>
+            Number.prototype.mod = function (n) {
+                "use strict";
+                return ((this % n) + n) % n;
+            };
+
+            document.addEventListener("DOMContentLoaded", function () {
+                const ring = document.getElementById("ring");
+                const tickInput = document.getElementById("tickInput");
+                const incrementButton = document.getElementById("increment");
+                const decrementButton = document.getElementById("decrement");
+                const startButton = document.getElementById("startAnimation");
+                const resetButton = document.getElementById("resetAnimation");
+
+                function createTicks(numTicks) {
+                    // Clear existing ticks
+                    document
+                        .querySelectorAll(".tick")
+                        .forEach((tick) => tick.remove());
+
+                    // Calculate angle between ticks
+                    const angleStep = 360 / numTicks;
+
+                    // Calculate the offset needed for proper alignment
+                    const angleOffset = angleStep / 1.9;
+
+                    // Create a temporary tick element to get computed styles
+                    const tempTick = document.createElement("div");
+                    tempTick.classList.add("tick");
+                    document.body.appendChild(tempTick);
+
+                    // Get the computed style of the temporary tick element
+                    const computedStyle = window.getComputedStyle(tempTick);
+                    const tickHeight = parseInt(
+                        computedStyle.getPropertyValue("height").split("p")[0],
+                    );
+                    const tickBorder = parseInt(
+                        computedStyle.getPropertyValue("border").split("p")[0],
+                    );
+                    const tickWidth = parseInt(
+                        computedStyle.getPropertyValue("width").split("p")[0],
+                    );
+
+                    // Remove the temporary tick element
+                    document.body.removeChild(tempTick);
+
+                    // Get ring dimensions and center
+                    const rect = ring.getBoundingClientRect();
+                    const radius = rect.width / 2; // Radius of the ring
+                    const centerX = radius - tickHeight - tickBorder * 2; // Center X position of the circular buffer
+                    const centerY = radius - tickWidth - tickBorder; // Center Y position of the circular buffer
+                    const tickRadius = radius - tickHeight + tickBorder * 2; // Position ticks slightly inside the ring
+
+                    for (let i = 0; i < numTicks; i++) {
+                        const tick = document.createElement("div");
+                        tick.classList.add("tick");
+                        ring.appendChild(tick);
+
+                        // Apply the angle offset to align the first tick correctly
+                        tick.style.transform = `rotate(${i * angleStep + angleOffset}deg) translateY(-${tickRadius}px)`;
+                        // Positioning ticks with respect to the center of the ring
+                        tick.style.top = `${centerX}px`;
+                        tick.style.left = `${centerY}px`;
+                    }
+                    startAnimation();
+                }
+
+                // Function to start the animation
+                function startAnimation() {
+                    const bufferPartCount = parseInt(tickInput.value);
+
+                    // Ensure that bufferPartCount is a valid number
+                    if (isNaN(bufferPartCount) || bufferPartCount <= 0) {
+                        console.error("Invalid input for bufferPartCount");
+                        return;
+                    }
+
+                    const writers = 2;
+                    const toModuloWith = bufferPartCount / writers;
+
+                    // Select all elements with the class 'tick'
+                    const ticks = document.querySelectorAll(".tick");
+                    const totalTicks = ticks.length;
+
+                    // Variables for infinite loop
+                    let index = 0;
+                    const interval = 1; // Base delay interval (can be adjusted as needed)
+
+                    function infiniteColorChange() {
+                        setTimeout(() => {
+                            const currentTick = ticks[index % totalTicks]; // Loop over ticks using modulo to wrap around
+                            currentTick.style.backgroundColor = "aliceblue"; // Change the tick color
+                            turnLast30TicksOrange(index, ticks);
+                            turnLast60TicksBrown(index, ticks);
+                            turnTicksBlack(index, ticks);
+                            index++; // Increment the index
+
+                            infiniteColorChange(); // Call the function again to create the infinite loop
+                        }, interval); // Increase delay with each tick
+                    }
+
+                    // Start the infinite animation loop
+                    infiniteColorChange();
+                }
+
+                // Function to reset the animation
+                function resetAnimation() {
+                    document.querySelectorAll(".tick").forEach((tick) => {
+                        tick.style.backgroundColor = "black"; // Reset tick color to black
+                    });
+                }
+
+                // Function to handle negative indices in modulo operation
+                function mod(n, m) {
+                    return ((n % m) + m) % m;
+                }
+
+                function turnLast60TicksBrown(index, ticks) {
+                    const totalTicks = ticks.length;
+                    const brownColor = "brown"; // Brown color for the ticks
+
+                    if (index % 30 === 0 && index > 30) {
+                        // Check if index is a multiple of 60 (but not 0)
+                        const startIdx = Math.max(0, index - 60); // Calculate the start index for coloring
+                        const endIdx = index - 1; // End index is just before the current index
+
+                        for (let i = startIdx; i <= endIdx - 30; i++) {
+                            ticks[i % totalTicks].style.backgroundColor =
+                                brownColor; // Apply brown color
+                        }
+                    }
+                }
+
+                function turnTicksBlack(index, ticks) {
+                    const totalTicks = ticks.length;
+                    const brownColor = "brown"; // Brown color for the ticks
+
+                    if (index % 60 === 0 && index > 90) {
+                        // Check if index is a multiple of 60 (but not 0)
+                        const startIdx = Math.max(0, index - 120); // Calculate the start index for coloring
+                        const endIdx = index - 60 - 1; // End index is just before the current index
+
+                        for (let i = startIdx; i <= endIdx; i++) {
+                            ticks[i % totalTicks].style.backgroundColor =
+                                "black"; // Apply brown color
+                        }
+                    }
+                }
+
+                function turnLast30TicksOrange(index, ticks) {
+                    const totalTicks = ticks.length;
+                    const orangeColor = "rgb(249, 165, 44)"; // Orange color
+
+                    if (index % 30 === 0 && index !== 0) {
+                        // Check if index is a multiple of 30 (but not 0)
+                        const startIdx = Math.max(0, index - 30); // Calculate the start index for coloring
+                        const endIdx = index - 1; // End index is just before the current index
+
+                        for (let i = startIdx; i <= endIdx; i++) {
+                            ticks[i % totalTicks].style.backgroundColor =
+                                orangeColor; // Apply orange color
+                        }
+                    }
+                }
+
+                function applyColorToTicks(startIdx, endIdx, color, ticks) {
+                    const totalTicks = ticks.length;
+                    for (let i = startIdx; i <= endIdx; i++) {
+                        // Wrap around using modulo to handle array bounds
+                        ticks[
+                            (i + totalTicks) % totalTicks
+                        ].style.backgroundColor = color;
+                    }
+                }
+
+                function colorFileWriterThread(index, ticks, toModuloWith) {
+                    let someNum = index - toModuloWith - 1;
+
+                    // Set color to orange for ticks in range [index - toModuloWith, index - 1]
+                    for (let i = index - toModuloWith; i <= index - 1; i++) {
+                        ticks[mod(i, ticks.length)].style.backgroundColor =
+                            "rgb(249, 165, 44)";
+                    }
+
+                    // Check if specific tick has color "rgb(121, 76, 74)"
+                    if (
+                        ticks[mod(1 - someNum - toModuloWith, ticks.length)]
+                            .style.backgroundColor === "rgb(121, 76, 74)"
+                    ) {
+                        console.log(
+                            ticks[mod(someNum - toModuloWith, ticks.length)],
+                        );
+
+                        // Set color to black for ticks in range [someNum + 1 - toModuloWith * 4, someNum - toModuloWith * 2]
+                        for (
+                            let i = someNum + 1 - toModuloWith * 4;
+                            i <= someNum - toModuloWith * 2;
+                            i++
+                        ) {
+                            ticks[mod(i, ticks.length)].style.backgroundColor =
+                                "black";
+                        }
+                    }
+
+                    // Check if specific tick has color "rgb(249, 165, 44)"
+                    if (
+                        ticks[mod(someNum, ticks.length)].style
+                            .backgroundColor === "rgb(249, 165, 44)"
+                    ) {
+                        // Set color to "rgb(121, 76, 74)" for ticks in range [index - toModuloWith * 2, index - toModuloWith - 1]
+                        for (
+                            let i = index - toModuloWith * 2;
+                            i <= index - toModuloWith - 1;
+                            i++
+                        ) {
+                            ticks[mod(i, ticks.length)].style.backgroundColor =
+                                "rgb(121, 76, 74)";
+                        }
+                    }
+                }
+
+                // Initialize with default number of ticks
+                createTicks(tickInput.value * 3);
+
+                // Update ticks when input value changes
+                tickInput.addEventListener("input", function () {
+                    createTicks(this.value);
+                });
+
+                // Increment button click event
+                incrementButton.addEventListener("click", function () {
+                    let currentValue = parseInt(tickInput.value, 10);
+                    if (currentValue < 1080) {
+                        tickInput.value = currentValue + 3;
+                        createTicks(tickInput.value * 3);
+                    }
+                });
+
+                // Decrement button click event
+                decrementButton.addEventListener("click", function () {
+                    let currentValue = parseInt(tickInput.value, 10);
+                    if (currentValue > 3) {
+                        tickInput.value = currentValue - 3;
+                        createTicks(tickInput.value * 3);
+                    }
+                });
+
+                // Start button click event
+                startButton.addEventListener("click", startAnimation);
+
+                // Reset button click event
+                resetButton.addEventListener("click", resetAnimation);
+            });
+        </script>
+
+
+</body></html>

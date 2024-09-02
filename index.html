@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+
+        <title>reveal.js - Markdown Example</title>
+
+        <link rel="stylesheet" href="../dist/reveal.css" />
+        <link rel="stylesheet" href="../dist/theme/white.css" id="theme" />
+
+        <link rel="stylesheet" href="../plugin/highlight/monokai.css" />
+    </head>
+    <style>
+        .logo {
+            width: 200px; /* Scale the SVG size */
+            z-index: 1000;
+        }
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100vh; /* Full viewport height */
+            background: linear-gradient(
+                to bottom,
+                #ffffff,
+                #f2f2f2
+            ); /* Light gray gradient */
+            overflow: hidden;
+            z-index: -1;
+        }
+        .container::before {
+            content: "";
+            position: absolute;
+            top: -600px; /* Adjust as needed */
+            right: -200px; /* Adjust as needed */
+            width: 2600px; /* Adjust width */
+            height: 2600px; /* Adjust height */
+            background: radial-gradient(
+                circle at center,
+                transparent 50%,
+                #f2f2f2 51%
+            );
+            transform: rotate(45deg);
+            z-index: -1;
+        }
+
+        .container::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 100%;
+            height: 200px; /* Adjust height */
+            background: #1c2a45; /* Navy blue color */
+            clip-path: ellipse(80% 30% at 100% 100%);
+        }
+        .right-logo {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+        }
+        .slide-left {
+            position: relative;
+            top: 0px;
+            right: 400px;
+        }
+        .iframe-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0%; /* Adds a little padding to prevent cut-off */
+            box-sizing: border-box; /* Ensures padding is included in the width/height calculation */
+        }
+
+        /* Scaling iframe */
+        .scaled-iframe-animate {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border: none;
+            transform: scale(0.7);
+            transform-origin: 10 0;
+            padding-bottom: 5%; /* Adds extra space at the bottom for scaling */
+        }
+
+        /* Scaling iframe */
+        .scaled-iframe-buff {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border: none;
+            transform: scale(1.05);
+            padding-top: 10%;
+            padding-bottom: 5%; /* Adds extra space at the bottom for scaling */
+        }
+
+        .scaled-iframe-spec {
+            position: relative;
+            width: 80%;
+            height: 90%;
+            border: none;
+            transform: scale(1);
+            padding-bottom: 20%;
+        }
+
+        /* Ensure iframe scales like code blocks in Reveal.js */
+        .iframe-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            margin-top: 5%;
+            height: calc(
+                100% + 10%
+            ); /* Slightly increases the height to prevent cut-off */
+            width: calc(
+                100% + 10%
+            ); /* Slightly increases the width to prevent cut-off */
+        }
+
+        .reveal .iframe-section .scaled-iframe {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain; /* Ensures content fits without distortion */
+        }
+
+        .legend h3 {
+            margin: 5px 0;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        /* Row styling to handle flex and spacing */
+        .legend-row-top {
+            display: flex;
+            justify-content: space-between; /* Spreads items across the row */
+            flex-wrap: wrap; /* Allows items to wrap onto the next line */
+            gap: 5px; /* Space between items */
+            margin-bottom: 10%;
+            margin-top: -25%;
+        }
+
+        .legend-row-side {
+            justify-content: space-between; /* Spreads items across the row */
+            flex-wrap: wrap; /* Allows items to wrap onto the next line */
+            gap: 5px; /* Space between items */
+        }
+
+        /* Individual legend item styling */
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        /* Color box styling */
+        .color-box {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border: 1px solid #000;
+        }
+
+        /* Specific colors for each item */
+        .color-box.buffer1 {
+            background-color: #ff6347; /* Tomato */
+        }
+
+        .color-box.buffer2 {
+            background-color: #3cb371; /* Medium Sea Green */
+        }
+
+        .color-box.buffer3 {
+            background-color: #1e90ff; /* Dodger Blue */
+        }
+
+        .color-box.aliceblue {
+            background-color: aliceblue;
+        }
+
+        .color-box.orange {
+            background-color: rgb(249, 165, 44);
+        }
+
+        .color-box.brown {
+            background-color: brown;
+        }
+
+        .color-box.black {
+            background-color: black;
+        }
+    </style>
+    <body>
+        <div class="reveal container">
+            <div>
+                <img src="images/ALBA_negatiu-1.svg" alt="Logo" class="logo" />
+            </div>
+            <div class="slides">
+                <section>
+                    <img
+                        src="images/VL-phantom.png"
+                        style="
+                            width: 30%;
+                            height: auto; /*to preserve the aspect ratio of the image*/
+                        "
+                    />
+                    <img
+                        src="images/EuresysLogo_Square_Color__003_.png"
+                        style="
+                            width: 20%;
+                            height: auto; /*to preserve the aspect ratio of the image*/
+                        "
+                    />
+                    <img
+                        src="images/ibm-spectrum-storage-suite-symbol.png"
+                        style="
+                            width: 35%;
+                            height: auto; /*to preserve the aspect ratio of the image*/
+                        "
+                    />
+                    <img
+                        src="images/HDF5_software.png"
+                        style="
+                            width: 25%;
+                            height: auto; /*to preserve the aspect ratio of the image*/
+                        "
+                    />
+                    <img
+                        src="images/mlx_nvidia.png"
+                        style="
+                            width: 23%;
+                            height: auto; /*to preserve the aspect ratio of the image*/
+                        "
+                    />
+                    <img
+                        src="images/crowlogo_main_light_color.svg"
+                        style="
+                            width: 33%;
+                            text-
+                            height: auto; /*to preserve the aspect ratio of the image*/
+                        "
+                    />
+                </section>
+                <section>
+                    <h1>Phantom S710</h1>
+                    <div class="r-stretch r-hstack">
+                        <img src="images/s710_photo.png" />
+                        <div class="r-vstack">
+                            <img src="images/s710_spec.jpg" />
+                            <ul
+                                class="fragment fade-in-then-out"
+                                style="white-space: nowrap; text-align: left"
+                            >
+                                <li>Mono</li>
+                                <li>Replaced by S711</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <img
+                        src="images/genicam_logo.png"
+                        class="r-frame right-logo"
+                    />
+                    <h2>Euresys</h2>
+                    <div class="r-stretch r-hstack">
+                        <div class="r-vstack">
+                            <p>FrameGrabber</p>
+                            <img
+                                src="images/3602_CoaxlinkOcto_3.png"
+                                width="225"
+                                height="150"
+                                style="margin-top: 0em; margin-bottom: 0px"
+                            />
+                            <p>GenTL Interface</p>
+                            <img
+                                src="images/gentl_producer.jpg"
+                                width="400"
+                                height="200"
+                                style="margin-top: 0em; margin-bottom: 0px"
+                            />
+                        </div>
+                        <ul style="white-space: nowrap; text-align: left">
+                            <li>2 x Euresys Octo CoaXPress</li>
+                            <li>FPGA DMA Transfer</li>
+                            <li>EGrabber C++ SDK</li>
+                            <li>RDMA Transfer</li>
+                            <li>Programable FPGA</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>Euresys C++ SDK</h2>
+                    <section data-markdown>
+                        <script type="text/template">
+                            ### Discover and create camera
+                            ```c++ [2|3|4|5,6]
+                            EGenTL genTL; //load EGenTL
+                            EGrabberDiscovery disco(genTL);
+                            disco.discover(); //discover all available cameras
+                            EGrabber<CallbackOnDemand> g(discovery.cameras(0));
+                            g.reallocBuffers(20); // prepare 20 buffers
+                            g.start(20); // grab 20 buffers
+                            ```
+                        </script>
+                    </section>
+
+                    <section data-markdown>
+                        <script type="text/template">
+                            ### Configure the camera
+                            ```c++ [1,2|4,5|8,9,10,11]
+                            auto pf = g.getString<RemoteModule>("PixelFormat");
+                            g.setString<RemoteModule>("PixelFormat", "Mono8");
+
+                            g.getString<DeviceModule>("CameraControlMethod");
+                            g.setInteger<DeviceModule>("CycleMinimumPeriod", cmp);
+
+                            //The SteamModule is special
+                            for (int i = 0; i < 4; ++i) {
+                                auto gb = g->gs(i);
+                                gb.setInteger<StreamModule>("BufferPartCount", bpc);
+                            }
+                            ```
+                        </script>
+                    </section>
+
+                    <section data-markdown>
+                        <script type="text/template">
+                            ### Validate camera setting
+                            ```c++ [2-5]
+                            const auto func = "ExposureTime";
+                            if(g.isAvailable<RemoteModule>(func)
+                                && g.isWriteable<RemoteModule>(func)
+                                && g.isDoubleInRange<RemoteModule>(func, et))
+                            {
+                                g.setFloat<RemoteModule>(func, exposureTime);
+                                return true;
+                            } else {
+                                return false;
+                            }
+                            ```
+                        </script>
+                    </section>
+
+                    <section data-markdown>
+                        <script type="text/template">
+                            ### Buffers with GPU pinning
+                            ```c++ [5|8|9]
+                            cudaSetDevice(0);
+                            Euresys::BufferIndexRange bir;
+                            unsigned char *cbuf = NULL;
+                            size_t psize = g.getPayloadSize();
+                            cudaMalloc((void **)&cbuf, psize);
+                            for (size_t i = 0; i < NUM_BUFFERS; ++i) {
+                                unsigned char *ptr, *dptr;
+                                cudaHostAlloc(&ptr, payLoadSize, cudaHostAllocMapped);
+                                bir = g.announceAndQueue(UserMemory(ptr, psize, dptr)
+                            }
+                            bir.begin=0;
+                            ```
+                        </script>
+                    </section>
+
+                    <section data-markdown>
+                        <script type="text/template">
+                            ### Buffer Info Elements
+                            ```c++[1|2|3|4|5]
+                              gc::BUFFER_INFO_BASE; //buffer ptr
+                              ge::BUFFER_INFO_CUSTOM_PART_SIZE;
+                              ge::BUFFER_INFO_CUSTOM_NUM_PARTS;
+                              ge::BUFFER_INFO_CUSTOM_NUM_DELIVERED_PARTS;
+                              ge::BUFFER_INFO_CUSTOM_PART_TIMESTAMPS;
+                            ```
+                        </script>
+                    </section>
+                </section>
+
+                <section class="iframe-section">
+                    <h3>Acquiring Buffers</h3>
+                    <div class="iframe-container">
+                        <iframe
+                            src="buffer.html"
+                            class="scaled-iframe-buff"
+                        ></iframe>
+                    </div>
+                </section>
+
+                <section data-background-iframe="buffer_animation_slow.html">
+                    <div class="legend">
+                        <div class="legend-row-top">
+                            <div class="legend-item">
+                                <div class="color-box buffer1"></div>
+                                <span>Buffer 0</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="color-box buffer2"></div>
+                                <span>Buffer 1</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="color-box buffer3"></div>
+                                <span>Buffer 2</span>
+                            </div>
+                        </div>
+                        <div class="legend-row-side">
+                            <div class="legend-item">
+                                <div class="color-box aliceblue"></div>
+                                <span>Delivered</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="color-box orange"></div>
+                                <span>Processed</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="color-box brown"></div>
+                                <span>Returning</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="color-box black"></div>
+                                <span>Ready</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section data-background-iframe="buffer_animation_fast.html">
+                    <p>Buffers</p>
+                </section>
+
+                <section class="iframe-section">
+                    <div class="iframe-container">
+                        <iframe
+                            data-src="spectrum_scale.html"
+                            class="scaled-iframe-spec"
+                        ></iframe>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <script src="../dist/reveal.js"></script>
+        <script src="../plugin/markdown/markdown.js"></script>
+        <script src="../plugin/highlight/highlight.js"></script>
+        <script src="../plugin/notes/notes.js"></script>
+        <script src="../plugin/math/math.js"></script>
+
+        <script>
+            Reveal.initialize({
+                controls: true,
+                progress: true,
+                history: true,
+                center: true,
+
+                plugins: [
+                    RevealMarkdown,
+                    RevealHighlight,
+                    RevealNotes,
+                    RevealMath.KaTeX,
+                ],
+            });
+        </script>
+    </body>
+</html>
