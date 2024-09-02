@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #fff;
+                margin: 0;
+                padding: 0px;
+            }
+
+            .container {
+                max-width: 800px;
+                margin: auto;
+                padding: 30px;
+            }
+
+            h1 {
+                color: #555;
+                border-bottom: 2px solid #0078d4;
+                padding-bottom: 5px;
+                margin-bottom: 10px;
+            }
+
+            h2 {
+                color: #555;
+                border-bottom: 2px solid #0078d4;
+                padding-bottom: 5px;
+                margin-bottom: 10px;
+            }
+
+            .client,
+            .file-system,
+            .nodes,
+            .reassembly {
+                margin-bottom: 0px;
+            }
+
+            .client-box {
+                width: 100%;
+                height: 80px;
+                background-color: #0078d4;
+                margin-top: 10px;
+                margin-bottom: 10px;
+                position: relative;
+                border-radius: 10px;
+                z-index: 3;
+            }
+
+            .chunk-line {
+                height: 25%;
+                background-color: #009688;
+                margin: 0px 0;
+                border-radius: 5px;
+                position: absolute;
+                left: 0;
+                right: 0;
+                z-index: 1;
+            }
+
+            .chunk-line:nth-child(1) {
+                top: 0px;
+                width: 25%;
+            }
+
+            .chunk-line:nth-child(2) {
+                top: 25%;
+                left: 25%;
+                width: 25%;
+            }
+
+            .chunk-line:nth-child(3) {
+                top: 50%;
+                left: 50%;
+                width: 25%;
+            }
+
+            .chunk-line:nth-child(4) {
+                top: 75%;
+                left: 75%;
+                width: 25%;
+            }
+
+            .file-system {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 1px;
+                justify-content: space-around;
+            }
+
+            .data-chunk {
+                background-color: #009688;
+                color: white;
+                padding: 10px;
+                border-radius: 5px;
+                text-align: center;
+                width: 10%;
+                height: 10%;
+            }
+
+            .nodes {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: space-evenly;
+                z-index: -1;
+            }
+
+            .node {
+                background-color: #4caf50;
+                color: white;
+                padding: 1%;
+                border-radius: 5px;
+                text-align: center;
+                width: 10%;
+                height: 20%;
+                position: relative;
+            }
+
+            .node-chunk {
+                background-color: #ffffff;
+                color: #000;
+                padding: 5px;
+                border-radius: 5px;
+                margin: 5px;
+                font-size: 12px;
+                text-align: center;
+            }
+
+            .reassembly {
+                text-align: center;
+            }
+
+            .file-box {
+                width: 100%;
+                height: 40px;
+                background-color: #0078d4;
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-top: 10px;
+                border-radius: 5px;
+                font-size: 30px;
+                margin-bottom: 0px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <!-- Client Request -->
+            <h1>IBM Spectrum Scale parallel write</h1>
+            <div class="client">
+                <div class="client-box">
+                    <div class="chunk-line"></div>
+                    <div class="chunk-line"></div>
+                    <div class="chunk-line"></div>
+                    <div class="chunk-line"></div>
+                </div>
+            </div>
+
+            <!-- File System -->
+            <h2>Divides into chunks and distributes chunks across nodes.</h2>
+            <div class="file-system">
+                <div class="data-chunk">Chunk 1</div>
+                <div class="data-chunk">Chunk 2</div>
+                <div class="data-chunk">Chunk 3</div>
+                <div class="data-chunk">Chunk 4</div>
+            </div>
+
+            <!-- Storage Nodes -->
+            <h2>Storage Nodes</h2>
+            <div class="nodes">
+                <div class="node">
+                    <p>Node 1</p>
+                    <div class="node-chunk">Chunk 1</div>
+                    <div class="node-chunk">Chunk 3</div>
+                </div>
+                <div class="node">
+                    <p>Node 2</p>
+                    <div class="node-chunk">Chunk 2</div>
+                </div>
+                <div class="node">
+                    <p>Node 3</p>
+                </div>
+                <div class="node">
+                    <p>Node 4</p>
+                    <div class="node-chunk">Chunk 4</div>
+                </div>
+            </div>
+
+            <!-- Data Reassembly -->
+            <h2>Chunks are written by nodes into the final file.</h2>
+            <div class="file-box">Final File</div>
+        </div>
+    </body>
+</html>
